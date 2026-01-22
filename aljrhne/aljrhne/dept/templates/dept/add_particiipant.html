@@ -1,0 +1,79 @@
+{% extends 'dept/base.html' %}
+{% load static %}
+
+{% block title %}إضافة مشارك{% endblock %}
+
+{% block content %}
+<section>
+    <h2 id="course-title">إضافة مشارك إلى دورة: {{ course.name }}</h2>
+    <a href="{% url 'dept:list_participants' course.id %}" style="display: inline-block; margin-bottom: 20px;">← العودة لقائمة المشاركين</a>
+    
+    <form id="add-participant-form" method="POST">
+        {% csrf_token %}
+        <h3>بيانات المشارك</h3>
+        
+        <label for="university-id">رقم العسكري:</label>
+        <input type="text" id="university-id" name="university_id" required placeholder="مثال: 20230001">
+        
+        <label for="full-name">الاسم الخماسي:</label>
+        <input type="text" id="full-name" name="full_name" required>
+        
+        <label for="jihad-name">الاسم الجهادي:</label>
+        <input type="text" id="jihad-name" name="jihad_name" required>
+        
+        <label for="birth-year">سنة الميلاد:</label>
+        <input type="number" id="birth-year" name="birth_year" required min="1900" max="2025">
+        
+        <label for="governorate">المحافظة:</label>
+        <input type="text" id="governorate" name="governorate" required>
+        
+        <label for="directorate">المديرية:</label>
+        <input type="text" id="directorate" name="directorate" required>
+        
+        <label for="isolation">العزلة:</label>
+        <input type="text" id="isolation" name="isolation" required>
+        
+        <label for="village">القرية:</label>
+        <input type="text" id="village" name="village" required>
+        
+        <label for="specialization">التخصص:</label>
+        <input type="text" id="specialization" name="specialization" required>
+        
+        <label for="affiliation">التبعية:</label>
+        <input type="text" id="affiliation" name="affiliation" required>
+        
+        <label for="contact-number">رقم التواصل:</label>
+        <input type="text" id="contact-number" name="contact_number" required>
+        
+        <button type="submit">إضافة المشارك</button>
+        <a href="{% url 'dept:list_participants' course.id %}" class="btn" style="background-color: #6c757d; text-align: center; display: block; margin-top: 10px;">إلغاء</a>
+    </form>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('add-participant-form');
+    
+    form.addEventListener('submit', function(e) {
+        // التحقق من صحة البيانات
+        const birthYear = document.getElementById('birth-year').value;
+        const currentYear = new Date().getFullYear();
+        
+        if (birthYear < 2000 || birthYear > currentYear) {
+            alert('2025سنة الميلاد يجب أن تكون بين 2000 و ' + currentYear);
+            e.preventDefault();
+            return false;
+        }
+        
+        const contactNumber = document.getElementById('contact-number').value;
+        if (contactNumber && !/^[0-9+]+$/.test(contactNumber)) {
+            alert('رقم التواصل يجب أن يحتوي على أرقام فقط');
+            e.preventDefault();
+            return false;
+        }
+        
+        return true;
+    });
+});
+</script>
+{% endblock %}

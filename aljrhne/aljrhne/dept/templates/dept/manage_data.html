@@ -1,0 +1,26 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const changePasswordForm = document.getElementById('change-password-form');
+    
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', function(e) {
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('كلمة المرور الجديدة وتأكيدها غير متطابقين.');
+                e.preventDefault();
+                return false;
+            }
+            
+            if (newPassword.length < 6) {
+                alert('يجب أن تكون كلمة المرور 6 أحرف على الأقل.');
+                e.preventDefault();
+                return false;
+            }
+            
+            return confirm('هل أنت متأكد من تغيير كلمة المرور؟');
+        });
+    }
+});
+</script>
+{% endblock %}
