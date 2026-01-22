@@ -1,0 +1,24 @@
+{% extends 'dept/base.html' %}
+{% load static %}
+
+{% block title %}إنشاء حساب جديد - نظام إدارة الدورات{% endblock %}
+
+{% block content %}
+<section id="register-section">
+    <h2>إنشاء حساب جديد</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="username">اسم المستخدم:</label>
+        <input type="text" id="username" name="username" required>
+        
+        <label for="password">كلمة السر:</label>
+        <input type="password" id="password" name="password" required>
+        
+        <label for="password_confirm">تأكيد كلمة السر:</label>
+        <input type="password" id="password_confirm" name="password_confirm" required>
+        
+        <button type="submit">إنشاء الحساب</button>
+    </form>
+    <p style="margin-top: 15px;">لديك حساب بالفعل؟ <a href="{% url 'dept:login' %}">سجل دخولك هنا</a></p>
+</section>
+{% endblock %}

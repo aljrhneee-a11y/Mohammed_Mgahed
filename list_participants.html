@@ -1,0 +1,55 @@
+{% extends 'dept/base.html' %}
+{% load static %}
+
+{% block title %}قائمة المشاركين - {{ course.name }}{% endblock %}
+
+{% block content %}
+<section>
+    <h2>قائمة المشاركين في دورة: {{ course.name }}</h2>
+    <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+        <a href="{% url 'dept:index' %}" class="btn">← العودة للرئيسية</a>
+        <a href="{% url 'dept:add_participant' course.id %}" class="btn" style="background-color: #28a745; color: white;">إضافة مشارك جديد +</a>
+        <a href="{% url 'dept:export_csv' %}?course_id={{ course.id }}" class="btn" style="background-color: #17a2b8; color: white;">تحميل ملف Excel (XLSX)</a>
+    </div>
+
+    {% if participants %}
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>رقم القيد الجامعي</th>
+                    <th>الاسم الخماسي</th>
+                    <th>الاسم الجهادي</th>
+                    <th>المحافظة</th>
+                    <th>التخصص</th>
+                    <th>رقم التواصل</th>
+                    <th>العمليات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in participants %}
+                <tr>
+                    <td>{{ p.university_id }}</td>
+                    <td>{{ p.full_name }}</td>
+                    <td>{{ p.jihad_name }}</td>
+                    <td>{{ p.governorate }}</td>
+                    <td>{{ p.specialization }}</td>
+                    <td>{{ p.contact_number }}</td>
+                    <td>
+                        <a href="{% url 'dept:edit_participant' course.id p.university_id %}" style="color: blue; margin-left: 10px;">تعديل</a>
+                        <a href="{% url 'dept:delete_participant' course.id p.university_id %}" 
+                           style="color: red;" 
+                           onclick="return confirm('هل أنت متأكد من حذف المشارك {{ p.full_name }}؟')">حذف</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>لا يوجد مشاركون مسجلون في هذه الدورة حالياً.</p>
+    {% endif %}
+</section>
+
+
+{% endblock %}

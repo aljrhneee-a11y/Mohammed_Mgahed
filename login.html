@@ -1,0 +1,60 @@
+{% extends 'dept/base.html' %}
+{% load static %}
+
+{% block title %}تسجيل الدخول{% endblock %}
+
+{% block content %}   
+<div style="max-width: 400px; margin: 50px auto; padding: 30px; background-color: white; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <img src="{% static 'images/aljrhne6.jpeg' %}" alt="شعار النظام" style="width: 200px; margin-bottom: 25px;">
+        <h2 style="margin: 0; color: #007bff;">تسجيل الدخول</h2>
+        <p style="color: #666; margin-top: 5px;">نظام إدارة الدورات التدريبية</p>
+    </div>
+    
+    {% if messages %}
+    <div style="margin-bottom: 20px;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <form method="POST" action="{% url 'dept:login' %}">
+        {% csrf_token %}
+        
+        {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
+        
+        <div style="margin-bottom: 20px;">
+            <label for="username" style="display: block; margin-bottom: 5px; font-weight: bold;">اسم المستخدم:</label>
+            <input type="text" id="username" name="username" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+            <label for="password" style="display: block; margin-bottom: 5px; font-weight: bold;">كلمة السر:</label>
+            <input type="password" id="password" name="password" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+        </div>
+        
+        <button type="submit" 
+                style="width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+            تسجيل الدخول
+        </button>
+        
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="{% url 'dept:index' %}" style="color: #007bff; text-decoration: none;">العودة للصفحة الرئيسية</a>
+        </div>
+    </form>
+    
+    <div style="margin-top: 30
+
+
+ {% endblock %}  
+
+
+
+ 

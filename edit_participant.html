@@ -1,0 +1,88 @@
+{% extends 'dept/base.html' %}
+{% load static %}
+
+{% block title %}تعديل مشارك{% endblock %}
+
+{% block content %}
+<section>
+    <h2 id="course-title">تعديل بيانات المشارك: {{ participant.full_name }}</h2>
+    <p>الدورة: {{ course.name }}</p>
+    <a href="{% url 'dept:list_participants' course.id %}" style="display: inline-block; margin-bottom: 20px;">← العودة لقائمة المشاركين</a>
+    
+    <form id="edit-participant-form" method="POST">
+        {% csrf_token %}
+        <h3>بيانات المشارك</h3>
+        
+        <label>رقم القيد الجامعي (لا يمكن تعديله):</label>
+        <input type="text" value="{{ participant.university_id }}" disabled style="background-color: #e9ecef;">
+        
+        <label for="full-name">الاسم الخماسي:</label>
+        <input type="text" id="full-name" name="full_name" value="{{ participant.full_name }}" required>
+        
+        <label for="jihad-name">الاسم الجهادي:</label>
+        <input type="text" id="jihad-name" name="jihad_name" value="{{ participant.jihad_name }}" required>
+        
+        <label for="birth-year">سنة الميلاد:</label>
+        <input type="number" id="birth-year" name="birth_year" value="{{ participant.birth_year }}" required min="1900" max="2025">
+        
+        <label for="governorate">المحافظة:</label>
+        <input type="text" id="governorate" name="governorate" value="{{ participant.governorate }}" required>
+        
+        <label for="directorate">المديرية:</label>
+        <input type="text" id="directorate" name="directorate" value="{{ participant.directorate }}" required>
+        
+        <label for="isolation">العزلة:</label>
+        <input type="text" id="isolation" name="isolation" value="{{ participant.isolation }}" required>
+        
+        <label for="village">القرية:</label>
+        <input type="text" id="village" name="village" value="{{ participant.village }}" required>
+        
+        <label for="specialization">التخصص:</label>
+        <input type="text" id="specialization" name="specialization" value="{{ participant.specialization }}" required>
+        
+        <label for="affiliation">التبعية:</label>
+        <input type="text" id="affiliation" name="affiliation" value="{{ participant.affiliation }}" required>
+        
+        <label for="contact-number">رقم التواصل:</label>
+        <input type="text" id="contact-number" name="contact_number" value="{{ participant.contact_number }}" required>
+        
+        <div style="margin-top: 20px;">
+            <button type="submit" class="edit-btn">حفظ التعديلات</button>
+            <a href="{% url 'dept:list_participants' course.id %}" class="btn" style="background-color: #6c757d; text-align: center; display: block; margin-top: 10px;">إلغاء</a>
+        </div>
+    </form>
+    
+    <div style="margin-top: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+        <h4>معلومات النظام:</h4>
+        <p><strong>أدخل بواسطة:</strong> {{ participant.entered_by.username }}</p>
+        <p><strong>تاريخ الإدخال:</strong> {{ participant.created_at|date:"Y/m/d H:i" }}</p>
+        <p><strong>آخر تعديل:</strong> {{ participant.updated_at|date:"Y/m/d H:i" }}</p>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('edit-participant-form');
+    
+    form.addEventListener('submit', function(e) {
+        const birthYear = document.getElementById('birth-year').value;
+        const currentYear = new Date().getFullYear();
+        
+        if (birthYear < 1900 || birthYear > currentYear) {
+            alert('سنة الميلاد يجب أن تكون بين 1900 و ' + currentYear);
+            e.preventDefault();
+            return false;
+        }
+        
+        const contactNumber = document.getElementById('contact-number').value;
+        if (contactNumber && !/^[0-9+]+$/.test(contactNumber)) {
+            alert('رقم التواصل يجب أن يحتوي على أرقام فقط');
+            e.preventDefault();
+            return false;
+        }
+        
+        return true;
+    });
+});
+</script>
+{% endblock %}

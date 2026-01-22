@@ -1,0 +1,111 @@
+{% extends 'dept/base.html' %}
+{% load static %}
+
+{% block title %}الصفحة الرئيسية - نظام إدارة الدورات{% endblock %}
+
+{% block content %}
+{% if not user.is_authenticated %}
+<style>
+    /* تنسيق الخلفية والصورة الشخصية */
+    body {
+        background-image: url("{% static 'images/aljrhnee.png' %}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+    }
+
+    .login-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .profile-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid white;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        margin-bottom: 20px;
+    }
+
+    .form-container {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    }
+
+    .course-card {
+        background: white;
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+</style>
+<section id="login-section">
+    <h2>تسجيل الدخول</h2>
+    <img src="{% static 'images/aljrhne1.jpeg' %}" alt="رمز إدارة الدورات" style="max-width: 150px; margin-bottom: 20px;">
+    <form id="index-login-form" method="POST" action="{% url 'dept:login' %}">
+        {% csrf_token %}
+        <label for="username">اسم المستخدم:</label>
+        <input type="text" id="username" name="username" required>
+        
+        <label for="password">كلمة السر:</label>
+        <input type="password" id="password" name="password" required>
+        
+        <button type="submit">دخول</button>
+    </form>
+</section>
+{% else %}
+<section id="add-course-section">
+    <h2>إنشاء دورة جديدة</h2>
+    <form id="add-course-form" method="POST" action="{% url 'dept:create_course' %}">
+        {% csrf_token %}
+        <label for="course-name">اسم الدورة:</label>
+        <input type="text" id="course-name" name="course_name" required>
+        <button type="submit">إنشاء الدورة</button>
+    </form>
+</section>
+
+<section id="courses-list-section">
+    <h2>قائمة الدورات</h2>
+    <div id="courses-container">
+        {% if courses %}
+            {% for course in courses %}
+            <div class="course-card">
+                <div>
+                    <h3>{{ course.name }}</h3>
+                    <p>عدد المشاركين: {{ course.participants.count }}</p>
+                    <small>أنشئ بواسطة: {{ course.created_by.username }} في {{ course.created_at|date:"Y/m/d" }}</small>
+                </div>
+                <div>
+                    <a href="{% url 'dept:add_participant' course.id %}" class="btn">إضافة مشارك</a>
+                    <a href="{% url 'dept:list_participants' course.id %}" class="btn">عرض المشاركين</a>
+                    <a href="{% url 'dept:export_csv' %}?course_id={{ course.id }}" class="btn" style="background-color: #17a2b8;">تحميل Excel</a>
+                    {% if user.profile.role == 'admin' %}
+                        <a href="{% url 'dept:delete_course' course.id %}" class="btn delete-btn" onclick="return confirm('هل أنت متأكد من حذف الدورة {{ course.name }}؟ سيتم حذف جميع المشاركين فيها.')">حذف الدورة</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>لا توجد دورات حاليًا. قم بإنشاء دورة جديدة.</p>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+
+{% endblock %}

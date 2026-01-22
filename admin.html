@@ -1,0 +1,148 @@
+{% extends 'dept/base.html' %}
+{% load static %}
+
+{% block title %}لوحة التحكم - الإدارة{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <header class="admin-header">
+        <h1>لوحة التحكم</h1>
+        <div class="user-info">
+            <span>مرحباً، {{ user.username }} (مسؤول)</span>
+            <a href="{% url 'dept:logout' %}" class="btn delete-btn">تسجيل الخروج</a>
+        </div>
+    </header>
+
+    <div class="admin-grid">
+        <!-- إدارة الدورات -->
+        <section class="admin-section">
+            <h2>إدارة الدورات</h2>
+            <div class="action-bar">
+                <form method="POST" action="{% url 'dept:create_course' %}" class="inline-form">
+                    {% csrf_token %}
+                    <input type="text" name="course_name" placeholder="اسم الدورة الجديدة" required>
+                    <button type="submit" class="btn">إنشاء دورة</button>
+                </form>
+            </div>
+            
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>اسم الدورة</th>
+                        <th>المشاركين</th>
+                        <th>تاريخ الإنشاء</th>
+                        <th>العمليات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses %}
+                    <tr>
+                        <td>{{ course.name }}</td>
+                        <td>{{ course.participants.count }}</td>
+                        <td>{{ course.created_at|date:"Y/m/d" }}</td>
+                        <td>
+                            <a href="{% url 'dept:list_participants' course.id %}" class="btn small">عرض</a>
+                            <a href="{% url 'dept:export_csv' %}?course_id={{ course.id }}" class="btn small success">تصدير Excel</a>
+                            <a href="{% url 'dept:delete_course' course.id %}" class="btn small delete-btn" onclick="return confirm('حذف الدورة؟')">حذف</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">لا توجد دورات حالياً</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <!-- إدارة المستخدمين -->
+        <section class="admin-section">
+            <h2>إدارة المستخدمين</h2>
+            <form id="add-user-form" class="inline-form">
+                {% csrf_token %}
+                <input type="text" id="new-username" placeholder="اسم المستخدم" required>
+                <input type="password" id="new-password" placeholder="كلمة السر" required>
+                <select id="new-role">
+                    <option value="user">مستخدم عادي</option>
+                    <option value="admin">مسؤول</option>
+                </select>
+                <button type="submit" class="btn">إضافة</button>
+            </form>
+
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>اسم المستخدم</th>
+                        <th>الصلاحية</th>
+                        <th>تاريخ الانضمام</th>
+                        <th>العمليات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>{{ u.username }}</td>
+                        <td>{{ u.profile.get_role_display }}</td>
+                        <td>{{ u.date_joined|date:"Y/m/d" }}</td>
+                        <td>
+                            {% if u != user %}
+                            <a href="{% url 'dept:toggle_user_role' u.id %}" class="btn small success">
+                                {% if u.profile.role == 'admin' %}تحويل لمستخدم عادي{% else %}تحويل لمسؤول{% endif %}
+                            </a>
+                            {% else %}
+                            <span class="text-muted">حسابك الحالي</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+
+<style>
+    .admin-container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+    .admin-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
+    .admin-section { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    .admin-table th, .admin-table td { padding: 12px; text-align: right; border-bottom: 1px solid #eee; }
+    .admin-table th { background: #f8f9fa; }
+    .inline-form { display: flex; gap: 10px; margin-bottom: 15px; }
+    .inline-form input, .inline-form select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+    .btn.small { padding: 5px 10px; font-size: 0.8em; }
+    .btn.success { background-color: #28a745; color: white; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addUserForm = document.getElementById('add-user-form');
+    if (addUserForm) {
+        addUserForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('new-username').value;
+            const password = document.getElementById('new-password').value;
+            const role = document.getElementById('new-role').value;
+            
+            fetch('{% url "dept:add_user_api" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({username, password, role})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('خطأ: ' + data.error);
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}
